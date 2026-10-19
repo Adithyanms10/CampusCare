@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}{{ self.guest() }}{% endblock %}
+{% block guest %}
+<div class="auth-card">
+  <h1>{{ code }}</h1>
+  <p>{{ message }}</p>
+  <a class="btn btn-primary" href="{{ url_for('auth.index') }}">Back to home</a>
+</div>
+{% endblock %}

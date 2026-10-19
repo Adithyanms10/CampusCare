@@ -1,0 +1,69 @@
+{% from '_macros.html' import csrf %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ title or 'Campus Care' }}{% endblock %} | Campus Care</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</head>
+<body class="{{ 'app' if current_user else 'guest' }}">
+{% macro toasts() %}
+<div class="toasts" aria-live="polite">
+  {% for category, message in get_flashed_messages(with_categories=true) %}
+  <div class="toast toast-{{ category }}" role="status">{{ message }}<button type="button" class="toast-close" aria-label="Dismiss">×</button></div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% if current_user %}
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <div class="brand">Campus Care</div>
+    <nav>
+      {% if current_user.role == 'student' %}
+        <a href="{{ url_for('student.dashboard') }}" {% if request.endpoint == 'student.dashboard' %}aria-current="page"{% endif %}>Dashboard</a>
+        <a href="{{ url_for('student.complaints') }}" {% if request.endpoint in ('student.complaints', 'student.detail') %}aria-current="page"{% endif %}>My complaints</a>
+        <a href="{{ url_for('student.new_complaint') }}" {% if request.endpoint == 'student.new_complaint' %}aria-current="page"{% endif %}>New complaint</a>
+      {% elif current_user.role == 'staff' %}
+        <a href="{{ url_for('staff.dashboard') }}" {% if request.endpoint == 'staff.dashboard' %}aria-current="page"{% endif %}>Dashboard</a>
+        <a href="{{ url_for('staff.complaints') }}" {% if request.endpoint in ('staff.complaints', 'staff.detail') %}aria-current="page"{% endif %}>Assigned complaints</a>
+      {% else %}
+        <a href="{{ url_for('admin.dashboard') }}" {% if request.endpoint == 'admin.dashboard' %}aria-current="page"{% endif %}>Dashboard</a>
+        <a href="{{ url_for('admin.complaints') }}" {% if request.endpoint in ('admin.complaints', 'admin.detail') %}aria-current="page"{% endif %}>All complaints</a>
+        <a href="{{ url_for('admin.users') }}" {% if request.endpoint == 'admin.users' %}aria-current="page"{% endif %}>Users</a>
+        <a href="{{ url_for('admin.organization') }}" {% if request.endpoint == 'admin.organization' %}aria-current="page"{% endif %}>Departments and categories</a>
+      {% endif %}
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-name">{{ current_user.name }}</div>
+      <div class="user-role">{{ current_user.role.title() }}</div>
+      <form method="post" action="{{ url_for('auth.logout') }}">{{ csrf() }}<button class="btn btn-ghost" type="submit">Log out</button></form>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Toggle menu" aria-controls="sidebar" aria-expanded="false">Menu</button>
+      <h1>{{ title }}</h1>
+    </header>
+    {{ toasts() }}
+    <main class="content">{% block content %}{% endblock %}</main>
+  </div>
+</div>
+{% else %}
+{{ toasts() }}
+<main class="guest-main">{% block guest %}{% endblock %}</main>
+{% endif %}
+
+<dialog id="confirm-dialog">
+  <form method="dialog">
+    <p id="confirm-text">Are you sure?</p>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" value="cancel">Cancel</button>
+      <button class="btn btn-primary" value="ok">Confirm</button>
+    </div>
+  </form>
+</dialog>
+</body>
+</html>

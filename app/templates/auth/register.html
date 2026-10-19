@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import csrf %}
+{% block guest %}
+<div class="auth-card">
+  <h1>Create a student account</h1>
+  <form method="post" class="form" data-loading>
+    {{ csrf() }}
+    <label>Full name <input type="text" name="name" value="{{ form.get('name', '') }}" required minlength="2" maxlength="100"></label>
+    <label>Email <input type="email" name="email" value="{{ form.get('email', '') }}" required></label>
+    <label>Password <input type="password" name="password" required minlength="8" autocomplete="new-password">
+      <span class="hint">At least 8 characters, with a letter and a number.</span></label>
+    <label>Confirm password <input type="password" name="confirm_password" required autocomplete="new-password"></label>
+    <button class="btn btn-primary" type="submit">Create account</button>
+  </form>
+  <p class="muted">Already registered? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+</div>
+{% endblock %}

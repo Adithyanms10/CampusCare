@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import csrf %}
+{% block content %}
+<section class="panel narrow">
+  <form method="post" class="form" data-loading data-confirm="Submit this complaint? You cannot edit it afterwards.">
+    {{ csrf() }}
+    <label>Category
+      <select name="category_id" required>
+        <option value="">Choose a category</option>
+        {% for c in categories %}<option value="{{ c.id }}" {{ 'selected' if form.get('category_id') == c.id|string }}>{{ c.name }}</option>{% endfor %}
+      </select></label>
+    <label>Subject <input type="text" name="subject" value="{{ form.get('subject', '') }}" required minlength="5" maxlength="150"></label>
+    <label>Description <textarea name="description" rows="7" required minlength="20" maxlength="3000">{{ form.get('description', '') }}</textarea>
+      <span class="hint">Include what happened, when, and where. At least 20 characters.</span></label>
+    <button class="btn btn-primary" type="submit">Submit complaint</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import complaint_table %}
+{% block content %}
+<section class="panel">
+  <form method="get" class="filters">
+    {% if 'status' in fields %}
+    <label>Status <select name="status"><option value="">All</option>
+      {% for s in statuses %}<option value="{{ s }}" {{ 'selected' if request.args.get('status') == s }}>{{ s.replace('_', ' ').title() }}</option>{% endfor %}
+    </select></label>{% endif %}
+    {% if 'priority' in fields %}
+    <label>Priority <select name="priority"><option value="">All</option>
+      {% for p in priorities %}<option value="{{ p }}" {{ 'selected' if request.args.get('priority') == p }}>{{ p.title() }}</option>{% endfor %}
+    </select></label>{% endif %}
+    {% if 'category' in fields %}
+    <label>Category <select name="category"><option value="">All</option>
+      {% for c in categories %}<option value="{{ c.id }}" {{ 'selected' if request.args.get('category') == c.id|string }}>{{ c.name }}</option>{% endfor %}
+    </select></label>{% endif %}
+    {% if 'assignee' in fields %}
+    <label>Assigned to <select name="assignee"><option value="">Anyone</option>
+      <option value="none" {{ 'selected' if request.args.get('assignee') == 'none' }}>Unassigned</option>
+      {% for u in assignees %}<option value="{{ u.id }}" {{ 'selected' if request.args.get('assignee') == u.id|string }}>{{ u.name }}</option>{% endfor %}
+    </select></label>{% endif %}
+    {% if 'overdue' in fields %}
+    <label class="check"><input type="checkbox" name="overdue" value="1" {{ 'checked' if request.args.get('overdue') == '1' }}> Overdue only</label>{% endif %}
+    <button class="btn btn-primary" type="submit">Apply filters</button>
+    <a class="btn btn-ghost" href="{{ url_for(list_endpoint) }}">Clear</a>
+  </form>
+  <label class="search">Search this list <input type="search" id="table-search" placeholder="Type to search"></label>
+  {{ complaint_table(complaints, detail_endpoint, show_student, show_assignee) }}
+</section>
+{% endblock %}

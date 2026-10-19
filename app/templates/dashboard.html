@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import complaint_table %}
+{% block content %}
+<section class="cards">
+  {% for card in cards %}
+  <div class="card card-{{ card.tone }}"><div class="card-value">{{ card.value }}</div><div class="card-label">{{ card.label }}</div></div>
+  {% endfor %}
+</section>
+{% if by_category is defined %}
+<section class="panel">
+  <h2>Complaints by category</h2>
+  <ul class="plain-list">
+    {% for name, count in by_category %}<li><span>{{ name }}</span><strong>{{ count }}</strong></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+<section class="panel">
+  <div class="panel-head"><h2>Recent complaints</h2><a href="{{ url_for(list_endpoint) }}">View all</a></div>
+  {{ complaint_table(recent, detail_endpoint, show_student=current_user.role != 'student', show_assignee=current_user.role == 'admin') }}
+</section>
+{% endblock %}

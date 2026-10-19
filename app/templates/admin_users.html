@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import csrf %}
+{% block content %}
+<section class="panel">
+  <h2>Create an account</h2>
+  <form method="post" action="{{ url_for('admin.create_user') }}" class="form inline-form" data-loading>
+    {{ csrf() }}
+    <label>Name <input type="text" name="name" required minlength="2" maxlength="100"></label>
+    <label>Email <input type="email" name="email" required></label>
+    <label>Temporary password <input type="password" name="password" required minlength="8" autocomplete="new-password"></label>
+    <label>Role <select name="role">{% for r in roles %}<option value="{{ r }}" {{ 'selected' if r == 'staff' }}>{{ r.title() }}</option>{% endfor %}</select></label>
+    <label>Department <select name="department_id"><option value="">None</option>
+      {% for d in departments %}<option value="{{ d.id }}">{{ d.name }}</option>{% endfor %}</select></label>
+    <button class="btn btn-primary" type="submit">Create account</button>
+  </form>
+</section>
+<section class="panel">
+  <h2>All users</h2>
+  <label class="search">Search users <input type="search" id="table-search" placeholder="Type to search"></label>
+  <div class="table-wrap">
+    <table class="table" data-searchable>
+      <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.name }}</td><td>{{ u.email }}</td>
+        <td><select name="role" form="user-{{ u.id }}" aria-label="Role for {{ u.email }}">{% for r in roles %}<option value="{{ r }}" {{ 'selected' if u.role == r }}>{{ r.title() }}</option>{% endfor %}</select></td>
+        <td><select name="department_id" form="user-{{ u.id }}" aria-label="Department for {{ u.email }}"><option value="">None</option>
+          {% for d in departments %}<option value="{{ d.id }}" {{ 'selected' if u.department_id == d.id }}>{{ d.name }}</option>{% endfor %}</select></td>
+        <td><select name="is_active" form="user-{{ u.id }}" aria-label="Account status for {{ u.email }}">
+          <option value="1" {{ 'selected' if u.is_active }}>Active</option><option value="0" {{ 'selected' if not u.is_active }}>Disabled</option></select></td>
+        <td><button class="btn btn-ghost" type="submit" form="user-{{ u.id }}">Save</button></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% for u in users %}
+  <form method="post" action="{{ url_for('admin.update_user', user_id=u.id) }}" data-loading data-confirm="Save changes to {{ u.email }}?" id="user-{{ u.id }}">{{ csrf() }}</form>
+  {% endfor %}
+</section>
+{% endblock %}

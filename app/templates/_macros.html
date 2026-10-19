@@ -1,0 +1,45 @@
+{% macro status_badge(status) -%}
+<span class="badge badge-{{ status }}">{{ status.replace('_', ' ').title() }}</span>
+{%- endmacro %}
+
+{% macro priority_badge(priority) -%}
+<span class="badge prio-{{ priority }}">{{ priority.title() }}</span>
+{%- endmacro %}
+
+{% macro csrf() -%}
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+{%- endmacro %}
+
+{% macro complaint_table(complaints, detail_endpoint, show_student=False, show_assignee=False) %}
+{% if complaints %}
+<div class="table-wrap">
+  <table class="table" data-searchable>
+    <thead>
+      <tr>
+        <th>ID</th><th>Subject</th><th>Category</th>
+        {% if show_student %}<th>Student</th>{% endif %}
+        {% if show_assignee %}<th>Assigned to</th>{% endif %}
+        <th>Status</th><th>Priority</th><th>Submitted</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in complaints %}
+      <tr>
+        <td>#{{ c.id }}</td>
+        <td><a href="{{ url_for(detail_endpoint, complaint_id=c.id) }}">{{ c.subject }}</a>
+          {% if c.is_overdue %}<span class="badge badge-overdue">Overdue</span>{% endif %}</td>
+        <td>{{ c.category.name }}</td>
+        {% if show_student %}<td>{{ c.student.name }}</td>{% endif %}
+        {% if show_assignee %}<td>{{ c.assignee.name if c.assignee else 'Unassigned' }}</td>{% endif %}
+        <td>{{ status_badge(c.status) }}</td>
+        <td>{{ priority_badge(c.priority) }}</td>
+        <td>{{ c.created_at.strftime('%d %b %Y') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="empty">No complaints match right now.</p>
+{% endif %}
+{% endmacro %}
